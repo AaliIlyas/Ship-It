@@ -13,11 +13,9 @@ namespace ShipIt.Models.ApiModels
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public double TotalWeight {get; set;}
-        public readonly IProductRepository _product;
- 
-        public StockAlteration(int productId, int quantity, IProductRepository product)
+        public StockAlteration(int productId, int quantity)
         {
-            _product = product;
+            var _product = new ProductRepository();
             ProductId = productId;
             Quantity = quantity;
             TotalWeight = _product.GetProductById(productId).Weight * Quantity;

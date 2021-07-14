@@ -53,7 +53,7 @@ namespace ShipIt.Controllers
                 else
                 {
                     var product = products[orderLine.gtin];
-                    lineItems.Add(new StockAlteration(product.Id, orderLine.quantity, new ProductRepository()));
+                    lineItems.Add(new StockAlteration(product.Id, orderLine.quantity));
                     productIds.Add(product.Id);
                 }
             }
