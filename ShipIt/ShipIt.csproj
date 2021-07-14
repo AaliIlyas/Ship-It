@@ -22,10 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove=".env" />
-      <Content Include=".env">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+      <_ContentIncludedByDefault Remove=".env" />
     </ItemGroup>
 
 </Project>
