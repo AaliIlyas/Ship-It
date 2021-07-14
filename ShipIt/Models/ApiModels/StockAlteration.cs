@@ -12,13 +12,13 @@ namespace ShipIt.Models.ApiModels
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
-        public double TotalWeight {get; set;}
+        public double StockAlterationWeight {get; set;}
         public StockAlteration(int productId, int quantity)
         {
             var _product = new ProductRepository();
             ProductId = productId;
             Quantity = quantity;
-            TotalWeight = _product.GetProductById(productId).Weight * Quantity;
+            StockAlterationWeight = _product.GetProductById(productId).Weight * Quantity;
 
             if (quantity < 0)
             {
