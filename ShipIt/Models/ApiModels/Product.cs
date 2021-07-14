@@ -1,6 +1,5 @@
-﻿﻿using System;
+﻿using ShipIt.Models.DataModels;
 using System.Text;
-using ShipIt.Models.DataModels;
 
 namespace ShipIt.Models.ApiModels
 {
@@ -32,7 +31,7 @@ namespace ShipIt.Models.ApiModels
         {
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             return new StringBuilder()
                     .AppendFormat("id: {0}, ", Id)

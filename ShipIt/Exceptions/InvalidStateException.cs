@@ -1,4 +1,4 @@
-﻿﻿namespace ShipIt.Exceptions
+﻿namespace ShipIt.Exceptions
 {
     public class InvalidStateException : ClientVisibleException
     {
@@ -10,8 +10,8 @@
 
         public override ErrorCode ErrorCode
         {
-            get { return _errorCode; }
-            set { _errorCode = value; }
+            get => _errorCode;
+            set => _errorCode = value;
         }
     }
 }

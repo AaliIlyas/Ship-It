@@ -1,19 +1,19 @@
-﻿﻿using System;
-using System.Collections.Generic;
- using NUnit.Framework;
- using ShipIt.Controllers;
+﻿using NUnit.Framework;
+using ShipIt.Controllers;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Models.DataModels;
 using ShipIt.Repositories;
 using ShipItTest.Builders;
+using System;
+using System.Collections.Generic;
 
 namespace ShipItTest
 {
     public class ProductControllerTests : AbstractBaseTest
     {
-        ProductController productController = new ProductController(new ProductRepository());
-        ProductRepository productRepository = new ProductRepository();
+        private readonly ProductController productController = new ProductController(new ProductRepository());
+        private readonly ProductRepository productRepository = new ProductRepository();
 
         private const int WAREHOUSE_ID = 1;
 
@@ -24,8 +24,8 @@ namespace ShipItTest
         public void TestRoundtripProductRepository()
         {
             onSetUp();
-            var product = new ProductBuilder().CreateProductDatabaseModel();
-            productRepository.AddProducts(new List<ProductDataModel>() {product});
+            ProductDataModel product = new ProductBuilder().CreateProductDatabaseModel();
+            productRepository.AddProducts(new List<ProductDataModel>() { product });
             Assert.AreEqual(productRepository.GetProductByGtin(product.Gtin).Name, product.Name);
             Assert.AreEqual(productRepository.GetProductByGtin(product.Gtin).Gtin, product.Gtin);
         }
@@ -34,11 +34,11 @@ namespace ShipItTest
         public void TestGetProduct()
         {
             onSetUp();
-            var productBuilder = new ProductBuilder().setGtin(GTIN);
-            productRepository.AddProducts(new List<ProductDataModel>() {productBuilder.CreateProductDatabaseModel()});
-            var result = productController.Get(GTIN);
+            ProductBuilder productBuilder = new ProductBuilder().setGtin(GTIN);
+            productRepository.AddProducts(new List<ProductDataModel>() { productBuilder.CreateProductDatabaseModel() });
+            ProductResponse result = productController.Get(GTIN);
 
-            var correctProduct = productBuilder.CreateProduct();
+            Product correctProduct = productBuilder.CreateProduct();
             Assert.IsTrue(ProductsAreEqual(correctProduct, result.Product));
             Assert.IsTrue(result.Success);
         }
@@ -61,12 +61,12 @@ namespace ShipItTest
         public void TestAddProducts()
         {
             onSetUp();
-            var productBuilder = new ProductBuilder().setGtin(GTIN);
-            var productRequest = productBuilder.CreateProductRequest();
+            ProductBuilder productBuilder = new ProductBuilder().setGtin(GTIN);
+            ProductsRequestModel productRequest = productBuilder.CreateProductRequest();
 
-            var response = productController.Post(productRequest);
-            var databaseProduct = productRepository.GetProductByGtin(GTIN);
-            var correctDatabaseProduct = productBuilder.CreateProductDatabaseModel();
+            Response response = productController.Post(productRequest);
+            ProductDataModel databaseProduct = productRepository.GetProductByGtin(GTIN);
+            ProductDataModel correctDatabaseProduct = productBuilder.CreateProductDatabaseModel();
 
             Assert.IsTrue(response.Success);
             ProductsAreEqual(new Product(databaseProduct), new Product(correctDatabaseProduct));
@@ -76,9 +76,9 @@ namespace ShipItTest
         public void TestAddPreexistingProduct()
         {
             onSetUp();
-            var productBuilder = new ProductBuilder().setGtin(GTIN);
-            productRepository.AddProducts(new List<ProductDataModel>() {productBuilder.CreateProductDatabaseModel()});
-            var productRequest = productBuilder.CreateProductRequest();
+            ProductBuilder productBuilder = new ProductBuilder().setGtin(GTIN);
+            productRepository.AddProducts(new List<ProductDataModel>() { productBuilder.CreateProductDatabaseModel() });
+            ProductsRequestModel productRequest = productBuilder.CreateProductRequest();
 
             try
             {
@@ -95,8 +95,8 @@ namespace ShipItTest
         public void TestAddDuplicateProduct()
         {
             onSetUp();
-            var productBuilder = new ProductBuilder().setGtin(GTIN);
-            var productRequest = productBuilder.CreateDuplicateProductRequest();
+            ProductBuilder productBuilder = new ProductBuilder().setGtin(GTIN);
+            ProductsRequestModel productRequest = productBuilder.CreateDuplicateProductRequest();
 
             try
             {
@@ -113,11 +113,11 @@ namespace ShipItTest
         public void TestDiscontinueProduct()
         {
             onSetUp();
-            var productBuilder = new ProductBuilder().setGtin(GTIN);
+            ProductBuilder productBuilder = new ProductBuilder().setGtin(GTIN);
             productRepository.AddProducts(new List<ProductDataModel>() { productBuilder.CreateProductDatabaseModel() });
 
             productController.Discontinue(GTIN);
-            var result = productController.Get(GTIN);
+            ProductResponse result = productController.Get(GTIN);
 
             Assert.IsTrue(result.Product.Discontinued);
             Assert.IsTrue(result.Success);
@@ -142,7 +142,7 @@ namespace ShipItTest
         public void TestDiscontinueNonexistantProduct()
         {
             onSetUp();
-            var nonExistantGtin = "12345678";
+            string nonExistantGtin = "12345678";
             try
             {
                 productController.Discontinue(nonExistantGtin);

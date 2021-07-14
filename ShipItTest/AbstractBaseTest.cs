@@ -1,8 +1,6 @@
-﻿using System.Configuration;
-using System.Data;
-using Microsoft.Extensions.Configuration;
-using Npgsql;
+﻿using Npgsql;
 using ShipIt.Repositories;
+using System.Data;
 
 namespace ShipItTest
 {
@@ -31,10 +29,10 @@ namespace ShipItTest
 
             using (IDbConnection connection = CreateSqlConnection())
             {
-                var command = connection.CreateCommand();
+                IDbCommand command = connection.CreateCommand();
                 command.CommandText = sql;
                 connection.Open();
-                var reader = command.ExecuteReader();
+                IDataReader reader = command.ExecuteReader();
                 try
                 {
                     reader.Read();

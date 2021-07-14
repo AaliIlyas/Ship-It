@@ -10,19 +10,19 @@ namespace ShipItTest.Builders
 
         public StockBuilder SetWarehouseId(int warehouseId)
         {
-            this.WarehouseId = warehouseId;
+            WarehouseId = warehouseId;
             return this;
         }
 
         public StockBuilder SetProductId(int productId)
         {
-            this.ProductId = productId;
+            ProductId = productId;
             return this;
         }
 
         public StockBuilder SetHeld(int held)
         {
-            this.Held = held;
+            Held = held;
             return this;
         }
 
@@ -30,9 +30,9 @@ namespace ShipItTest.Builders
         {
             return new StockDataModel()
             {
-                WarehouseId = this.WarehouseId,
-                ProductId = this.ProductId,
-                held = this.Held
+                WarehouseId = WarehouseId,
+                ProductId = ProductId,
+                held = Held
             };
         }
     }

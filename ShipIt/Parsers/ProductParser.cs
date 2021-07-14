@@ -1,7 +1,7 @@
-﻿﻿using System.Collections.Generic;
-using System.Linq;
-using ShipIt.Exceptions;
+﻿using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipIt.Parsers
 {
@@ -32,25 +32,21 @@ namespace ShipIt.Parsers
             {
                 throw new MalformedRequestException(string.Join("\n", errors));
             }
-            
-            bool discontinued;
-            int lowerThreshold;
-            int minimumOrderQuantity;
-            int weight;
-            
-            if (!bool.TryParse(requestModel.Discontinued, out discontinued))
+
+
+            if (!bool.TryParse(requestModel.Discontinued, out bool discontinued))
             {
                 errors.Add("Discontinued must be set to true or false");
             }
-            if (!int.TryParse(requestModel.LowerThreshold, out lowerThreshold))
+            if (!int.TryParse(requestModel.LowerThreshold, out int lowerThreshold))
             {
                 errors.Add("LowerThreshold must be set to an integer");
             }
-            if (!int.TryParse(requestModel.MinimumOrderQuantity, out minimumOrderQuantity))
+            if (!int.TryParse(requestModel.MinimumOrderQuantity, out int minimumOrderQuantity))
             {
                 errors.Add("MinimumOrderQuantity must be set to an integer");
             }
-            if (!int.TryParse(requestModel.Weight, out weight))
+            if (!int.TryParse(requestModel.Weight, out int weight))
             {
                 errors.Add("Weight must be set to an integer");
             }

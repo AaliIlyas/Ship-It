@@ -1,12 +1,12 @@
-﻿﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Models.DataModels;
 using ShipIt.Parsers;
 using ShipIt.Repositories;
 using ShipIt.Validators;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipIt.Controllers
 {
@@ -32,7 +32,7 @@ namespace ShipIt.Controllers
 
             Log.Info("Looking up product by gtin: " + gtin);
 
-            var product = new Product(_productRepository.GetProductByGtin(gtin));
+            Product product = new Product(_productRepository.GetProductByGtin(gtin));
 
             Log.Info("Found product: " + product);
 
@@ -42,20 +42,20 @@ namespace ShipIt.Controllers
         [HttpPost("")]
         public Response Post([FromBody] ProductsRequestModel requestModel)
         {
-            var parsedProducts = new List<Product>();
+            List<Product> parsedProducts = new List<Product>();
 
-            foreach (var requestProduct in requestModel.Products)
+            foreach (ProductRequestModel requestProduct in requestModel.Products)
             {
-                var parsedProduct = requestProduct.Parse();
+                Product parsedProduct = requestProduct.Parse();
                 new ProductValidator().Validate(parsedProduct);
                 parsedProducts.Add(parsedProduct);
             }
 
             Log.Info("Adding products: " + parsedProducts);
 
-            var dataProducts = parsedProducts.Select(p => new ProductDataModel(p));
+            IEnumerable<ProductDataModel> dataProducts = parsedProducts.Select(p => new ProductDataModel(p));
             _productRepository.AddProducts(dataProducts);
-            
+
             Log.Debug("Products added successfully");
 
             return new Response() { Success = true };

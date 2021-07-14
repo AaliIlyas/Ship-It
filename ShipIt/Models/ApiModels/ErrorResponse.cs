@@ -1,4 +1,4 @@
-﻿﻿using ShipIt.Exceptions;
+﻿using ShipIt.Exceptions;
 
 namespace ShipIt.Models.ApiModels
 {

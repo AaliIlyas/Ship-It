@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Repositories;
+using System.Collections.Generic;
 
 namespace ShipIt.Controllers
 {
@@ -28,8 +28,8 @@ namespace ShipIt.Controllers
 
             Log.Info($"Looking up company by name: {gcp}");
 
-            var companyDataModel = _companyRepository.GetCompany(gcp);
-            var company = new Company(companyDataModel);
+            Models.DataModels.CompanyDataModel companyDataModel = _companyRepository.GetCompany(gcp);
+            Company company = new Company(companyDataModel);
 
             Log.Info("Found company: " + company);
 
@@ -49,10 +49,10 @@ namespace ShipIt.Controllers
             Log.Info("Adding companies: " + companiesToAdd);
 
             _companyRepository.AddCompanies(companiesToAdd);
-            
+
             Log.Debug("Companies added successfully");
 
-            return new Response {Success = true};
+            return new Response { Success = true };
         }
     }
 }

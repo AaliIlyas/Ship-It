@@ -1,29 +1,24 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Dynamic;
-using System.Linq;
-using Npgsql;
+﻿using Npgsql;
 using ShipIt.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace ShipIt.Repositories
 {
     public abstract class RepositoryBase
     {
-        private IDbConnection Connection
-        {
-            get { return new NpgsqlConnection(ConnectionHelper.GetConnectionString()); }
-        }
+        private IDbConnection Connection => new NpgsqlConnection(ConnectionHelper.GetConnectionString());
 
         protected long QueryForLong(string sqlString)
         {
             using (IDbConnection connection = Connection)
             {
-                var command = connection.CreateCommand();
+                IDbCommand command = connection.CreateCommand();
                 command.CommandText = sqlString;
                 connection.Open();
-                var reader = command.ExecuteReader();
+                IDataReader reader = command.ExecuteReader();
 
                 try
                 {
@@ -36,19 +31,19 @@ namespace ShipIt.Repositories
                 }
             };
         }
-        
+
         protected void RunSingleQuery(string sql, string noResultsExceptionMessage, params NpgsqlParameter[] parameters)
         {
             using (IDbConnection connection = Connection)
             {
-                var command = connection.CreateCommand();
+                IDbCommand command = connection.CreateCommand();
                 command.CommandText = sql;
-                foreach (var parameter in parameters)
+                foreach (NpgsqlParameter parameter in parameters)
                 {
                     command.Parameters.Add(parameter);
                 }
                 connection.Open();
-                var reader = command.ExecuteReader();
+                IDataReader reader = command.ExecuteReader();
 
                 try
                 {
@@ -69,14 +64,14 @@ namespace ShipIt.Repositories
         {
             using (IDbConnection connection = Connection)
             {
-                var command = connection.CreateCommand();
+                IDbCommand command = connection.CreateCommand();
                 command.CommandText = sql;
-                foreach (var parameter in parameters)
+                foreach (NpgsqlParameter parameter in parameters)
                 {
                     command.Parameters.Add(parameter);
                 }
                 connection.Open();
-                var reader = command.ExecuteReader();
+                IDataReader reader = command.ExecuteReader();
 
                 try
                 {
@@ -99,17 +94,17 @@ namespace ShipIt.Repositories
         {
             using (IDbConnection connection = Connection)
             {
-                var command = connection.CreateCommand();
+                IDbCommand command = connection.CreateCommand();
                 command.CommandText = sql;
                 if (parameters != null)
                 {
-                    foreach (var parameter in parameters)
+                    foreach (NpgsqlParameter parameter in parameters)
                     {
                         command.Parameters.Add(parameter);
                     }
                 }
                 connection.Open();
-                var reader = command.ExecuteReader();
+                IDataReader reader = command.ExecuteReader();
 
                 try
                 {
@@ -135,14 +130,14 @@ namespace ShipIt.Repositories
         {
             using (IDbConnection connection = Connection)
             {
-                var command = connection.CreateCommand();
+                IDbCommand command = connection.CreateCommand();
                 command.CommandText = sql;
-                foreach (var parameter in parameters)
+                foreach (NpgsqlParameter parameter in parameters)
                 {
                     command.Parameters.Add(parameter);
                 }
                 connection.Open();
-                var reader = command.ExecuteReader();
+                IDataReader reader = command.ExecuteReader();
 
                 try
                 {
@@ -160,19 +155,19 @@ namespace ShipIt.Repositories
             using (IDbConnection connection = Connection)
             {
                 connection.Open();
-                var command = connection.CreateCommand();
-                var transaction = connection.BeginTransaction();
+                IDbCommand command = connection.CreateCommand();
+                IDbTransaction transaction = connection.BeginTransaction();
                 command.Transaction = transaction;
-                var recordsAffected = new List<int>();
+                List<int> recordsAffected = new List<int>();
 
                 try
                 {
-                    foreach (var parameters in parametersList)
+                    foreach (NpgsqlParameter[] parameters in parametersList)
                     {
                         command.CommandText = sql;
                         command.Parameters.Clear();
 
-                        foreach (var parameter in parameters)
+                        foreach (NpgsqlParameter parameter in parameters)
                         {
                             command.Parameters.Add(parameter);
                         }

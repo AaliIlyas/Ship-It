@@ -1,4 +1,4 @@
-﻿﻿using System.Data;
+﻿using System.Data;
 
 namespace ShipIt.Models.DataModels
 {
@@ -11,8 +11,8 @@ namespace ShipIt.Models.DataModels
         [DatabaseColumnName("hld")]
         public int held { get; set; }
 
-        public StockDataModel(IDataReader dataReader): base(dataReader) { }
-        
-        public StockDataModel() {}
+        public StockDataModel(IDataReader dataReader) : base(dataReader) { }
+
+        public StockDataModel() { }
     }
 }

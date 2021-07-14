@@ -1,7 +1,4 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace ShipIt.Models.ApiModels
 {
@@ -10,7 +7,7 @@ namespace ShipIt.Models.ApiModels
         public IEnumerable<Employee> Employees { get; set; }
         public EmployeeResponse(Employee employee)
         {
-            Employees = new List<Employee>() {employee};
+            Employees = new List<Employee>() { employee };
             Success = true;
         }
         public EmployeeResponse(IEnumerable<Employee> employees)

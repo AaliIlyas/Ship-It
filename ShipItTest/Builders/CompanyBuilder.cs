@@ -1,74 +1,71 @@
-﻿﻿using System;
+﻿using ShipIt.Models.ApiModels;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ShipIt.Models.ApiModels;
 
 namespace ShipItTest.Builders
 {
     public class CompanyBuilder
     {
-        private String Gcp = "0000346";
-        private String Name = "Robert Bosch Tool Corporation";
-        private String Addr2 = "1800 West Central";
-        private String Addr3 = "";
-        private String Addr4 = "IL";
-        private String PostalCode = "60056";
-        private String City = "Mount Prospect";
-        private String Tel = "(224) 232-2407";
-        private String Mail = "info@gs1us.org";
+        private string Gcp = "0000346";
+        private string Name = "Robert Bosch Tool Corporation";
+        private string Addr2 = "1800 West Central";
+        private string Addr3 = "";
+        private string Addr4 = "IL";
+        private string PostalCode = "60056";
+        private string City = "Mount Prospect";
+        private string Tel = "(224) 232-2407";
+        private string Mail = "info@gs1us.org";
 
-        public CompanyBuilder setGcp(String gcp)
+        public CompanyBuilder setGcp(string gcp)
         {
-            this.Gcp = gcp;
+            Gcp = gcp;
             return this;
         }
 
-        public CompanyBuilder setName(String name)
+        public CompanyBuilder setName(string name)
         {
-            this.Name = name;
+            Name = name;
             return this;
         }
 
-        public CompanyBuilder setAddr2(String addr2)
+        public CompanyBuilder setAddr2(string addr2)
         {
-            this.Addr2= addr2;
+            Addr2 = addr2;
             return this;
         }
 
-        public CompanyBuilder setAddr3(String addr3)
+        public CompanyBuilder setAddr3(string addr3)
         {
-            this.Addr3 = addr3;
+            Addr3 = addr3;
             return this;
         }
 
-        public CompanyBuilder setAddr4(String addr4)
+        public CompanyBuilder setAddr4(string addr4)
         {
-            this.Addr4 = addr4;
+            Addr4 = addr4;
             return this;
         }
 
-        public CompanyBuilder setPostalCode(String postalCode)
+        public CompanyBuilder setPostalCode(string postalCode)
         {
-            this.PostalCode = postalCode;
+            PostalCode = postalCode;
             return this;
         }
 
-        public CompanyBuilder setCity(String city)
+        public CompanyBuilder setCity(string city)
         {
-            this.City = city;
+            City = city;
             return this;
         }
 
-        public CompanyBuilder setTel(String tel)
+        public CompanyBuilder setTel(string tel)
         {
-            this.Tel = tel;
+            Tel = tel;
             return this;
         }
 
-        public CompanyBuilder setMail(String mail)
+        public CompanyBuilder setMail(string mail)
         {
-            this.Mail = mail;
+            Mail = mail;
             return this;
         }
 
@@ -76,15 +73,15 @@ namespace ShipItTest.Builders
         {
             return new Company()
             {
-                Gcp = this.Gcp,
-                Name = this.Name,
-                Addr2 = this.Addr2,
-                Addr3 = this.Addr3,
-                Addr4 = this.Addr4,
-                PostalCode = this.PostalCode,
-                City = this.City,
-                Tel = this.Tel,
-                Mail = this.Mail
+                Gcp = Gcp,
+                Name = Name,
+                Addr2 = Addr2,
+                Addr3 = Addr3,
+                Addr4 = Addr4,
+                PostalCode = PostalCode,
+                City = City,
+                Tel = Tel,
+                Mail = Mail
             };
         }
 
@@ -96,15 +93,15 @@ namespace ShipItTest.Builders
                 {
                     new Company()
                     {
-                        Gcp = this.Gcp,
-                        Name = this.Name,
-                        Addr2 = this.Addr2,
-                        Addr3 = this.Addr3,
-                        Addr4 = this.Addr4,
-                        PostalCode = this.PostalCode,
-                        City = this.City,
-                        Tel = this.Tel,
-                        Mail = this.Mail
+                        Gcp = Gcp,
+                        Name = Name,
+                        Addr2 = Addr2,
+                        Addr3 = Addr3,
+                        Addr4 = Addr4,
+                        PostalCode = PostalCode,
+                        City = City,
+                        Tel = Tel,
+                        Mail = Mail
                     }
                 }
             };

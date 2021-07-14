@@ -1,9 +1,5 @@
-﻿﻿using ShipIt.Exceptions;
+﻿using ShipIt.Exceptions;
 using ShipIt.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 
 namespace ShipIt.Models.ApiModels
@@ -12,10 +8,10 @@ namespace ShipIt.Models.ApiModels
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
-        public double StockAlterationWeight {get; set;}
+        public double StockAlterationWeight { get; set; }
         public StockAlteration(int productId, int quantity)
         {
-            var _product = new ProductRepository();
+            ProductRepository _product = new ProductRepository();
             ProductId = productId;
             Quantity = quantity;
             StockAlterationWeight = _product.GetProductById(productId).Weight * Quantity;

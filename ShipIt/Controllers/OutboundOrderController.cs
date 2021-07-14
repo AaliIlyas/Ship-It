@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipIt.Controllers
 {
@@ -30,35 +30,35 @@ namespace ShipIt.Controllers
         [HttpPost("")]
         public OutBoundOrder Post([FromBody] OutboundOrderRequestModel request)
         {
-            Log.Info(String.Format("Processing outbound order: {0}", request));
+            Log.Info(string.Format("Processing outbound order: {0}", request));
 
-            var gtins = new List<String>();
-            foreach (var orderLine in request.OrderLines)
+            List<string> gtins = new List<string>();
+            foreach (OrderLine orderLine in request.OrderLines)
             {
-                if (gtins.Contains(orderLine.gtin))
+                if (gtins.Contains(orderLine.Gtin))
                 {
-                    throw new ValidationException(String.Format("Outbound order request contains duplicate product gtin: {0}", orderLine.gtin));
+                    throw new ValidationException(string.Format("Outbound order request contains duplicate product gtin: {0}", orderLine.Gtin));
                 }
-                gtins.Add(orderLine.gtin);
+                gtins.Add(orderLine.Gtin);
             }
 
-            var productDataModels = _productRepository.GetProductsByGtin(gtins);
-            var products = productDataModels.ToDictionary(p => p.Gtin, p => new Product(p));
+            IEnumerable<Models.DataModels.ProductDataModel> productDataModels = _productRepository.GetProductsByGtin(gtins);
+            Dictionary<string, Product> products = productDataModels.ToDictionary(p => p.Gtin, p => new Product(p));
 
-            var lineItems = new List<StockAlteration>();
-            var productIds = new List<int>();
-            var errors = new List<string>();
+            List<StockAlteration> lineItems = new List<StockAlteration>();
+            List<int> productIds = new List<int>();
+            List<string> errors = new List<string>();
 
-            foreach (var orderLine in request.OrderLines)
+            foreach (OrderLine orderLine in request.OrderLines)
             {
-                if (!products.ContainsKey(orderLine.gtin))
+                if (!products.ContainsKey(orderLine.Gtin))
                 {
-                    errors.Add(string.Format("Unknown product gtin: {0}", orderLine.gtin));
+                    errors.Add(string.Format("Unknown product gtin: {0}", orderLine.Gtin));
                 }
                 else
                 {
-                    var product = products[orderLine.gtin];
-                    lineItems.Add(new StockAlteration(product.Id, orderLine.quantity));
+                    Product product = products[orderLine.Gtin];
+                    lineItems.Add(new StockAlteration(product.Id, orderLine.Quantity));
                     productIds.Add(product.Id);
                 }
             }
@@ -68,27 +68,27 @@ namespace ShipIt.Controllers
                 throw new NoSuchEntityException(string.Join("; ", errors));
             }
 
-            var stock = _stockRepository.GetStockByWarehouseAndProductIds(request.WarehouseId, productIds);
+            Dictionary<int, Models.DataModels.StockDataModel> stock = _stockRepository.GetStockByWarehouseAndProductIds(request.WarehouseId, productIds);
 
-            var orderLines = request.OrderLines.ToList();
+            List<OrderLine> orderLines = request.OrderLines.ToList();
             errors = new List<string>();
 
             for (int i = 0; i < lineItems.Count; i++)
             {
-                var lineItem = lineItems[i];
-                var orderLine = orderLines[i];
+                StockAlteration lineItem = lineItems[i];
+                OrderLine orderLine = orderLines[i];
 
                 if (!stock.ContainsKey(lineItem.ProductId))
                 {
-                    errors.Add(string.Format("Product: {0}, no stock held", orderLine.gtin));
+                    errors.Add(string.Format("Product: {0}, no stock held", orderLine.Gtin));
                     continue;
                 }
 
-                var item = stock[lineItem.ProductId];
+                Models.DataModels.StockDataModel item = stock[lineItem.ProductId];
                 if (lineItem.Quantity > item.held)
                 {
                     errors.Add(
-                        string.Format("Product: {0}, stock held: {1}, stock to remove: {2}", orderLine.gtin, item.held,
+                        string.Format("Product: {0}, stock held: {1}, stock to remove: {2}", orderLine.Gtin, item.held,
                             lineItem.Quantity));
                 }
             }
@@ -102,7 +102,7 @@ namespace ShipIt.Controllers
 
             double totalWeight = 0;
 
-            foreach (var item in lineItems)
+            foreach (StockAlteration item in lineItems)
             {
                 totalWeight += item.StockAlterationWeight;
             }

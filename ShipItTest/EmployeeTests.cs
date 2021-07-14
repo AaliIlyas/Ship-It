@@ -1,19 +1,19 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
- using NUnit.Framework;
- using ShipIt.Controllers;
+﻿using NUnit.Framework;
+using ShipIt.Controllers;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Repositories;
 using ShipItTest.Builders;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipItTest
 {
     public class EmployeeControllerTests : AbstractBaseTest
     {
-        EmployeeController employeeController = new EmployeeController(new EmployeeRepository());
-        EmployeeRepository employeeRepository = new EmployeeRepository();
+        private readonly EmployeeController employeeController = new EmployeeController(new EmployeeRepository());
+        private readonly EmployeeRepository employeeRepository = new EmployeeRepository();
 
         private const string NAME = "Gissell Sadeem";
         private const int WAREHOUSE_ID = 1;
@@ -22,8 +22,8 @@ namespace ShipItTest
         public void TestRoundtripEmployeeRepository()
         {
             onSetUp();
-            var employee = new EmployeeBuilder().CreateEmployee();
-            employeeRepository.AddEmployees(new List<Employee>() {employee});
+            Employee employee = new EmployeeBuilder().CreateEmployee();
+            employeeRepository.AddEmployees(new List<Employee>() { employee });
             Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).Name, employee.Name);
             Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).Ext, employee.ext);
             Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).WarehouseId, employee.WarehouseId);
@@ -33,11 +33,11 @@ namespace ShipItTest
         public void TestGetEmployeeByName()
         {
             onSetUp();
-            var employeeBuilder = new EmployeeBuilder().setName(NAME);
-            employeeRepository.AddEmployees(new List<Employee>() {employeeBuilder.CreateEmployee()});
-            var result = employeeController.Get(NAME);
+            EmployeeBuilder employeeBuilder = new EmployeeBuilder().setName(NAME);
+            employeeRepository.AddEmployees(new List<Employee>() { employeeBuilder.CreateEmployee() });
+            EmployeeResponse result = employeeController.Get(NAME);
 
-            var correctEmployee = employeeBuilder.CreateEmployee();
+            Employee correctEmployee = employeeBuilder.CreateEmployee();
             Assert.IsTrue(EmployeesAreEqual(correctEmployee, result.Employees.First()));
             Assert.IsTrue(result.Success);
         }
@@ -46,13 +46,13 @@ namespace ShipItTest
         public void TestGetEmployeesByWarehouseId()
         {
             onSetUp();
-            var employeeBuilderA = new EmployeeBuilder().setWarehouseId(WAREHOUSE_ID).setName("A");
-            var employeeBuilderB = new EmployeeBuilder().setWarehouseId(WAREHOUSE_ID).setName("B");
+            EmployeeBuilder employeeBuilderA = new EmployeeBuilder().setWarehouseId(WAREHOUSE_ID).setName("A");
+            EmployeeBuilder employeeBuilderB = new EmployeeBuilder().setWarehouseId(WAREHOUSE_ID).setName("B");
             employeeRepository.AddEmployees(new List<Employee>() { employeeBuilderA.CreateEmployee(), employeeBuilderB.CreateEmployee() });
-            var result = employeeController.Get(WAREHOUSE_ID).Employees.ToList();
+            List<Employee> result = employeeController.Get(WAREHOUSE_ID).Employees.ToList();
 
-            var correctEmployeeA = employeeBuilderA.CreateEmployee();
-            var correctEmployeeB = employeeBuilderB.CreateEmployee();
+            Employee correctEmployeeA = employeeBuilderA.CreateEmployee();
+            Employee correctEmployeeB = employeeBuilderB.CreateEmployee();
 
             Assert.IsTrue(result.Count == 2);
             Assert.IsTrue(EmployeesAreEqual(correctEmployeeA, result.First()));
@@ -80,7 +80,7 @@ namespace ShipItTest
             onSetUp();
             try
             {
-                var employees = employeeController.Get(WAREHOUSE_ID).Employees.ToList();
+                List<Employee> employees = employeeController.Get(WAREHOUSE_ID).Employees.ToList();
                 Assert.Fail("Expected exception to be thrown.");
             }
             catch (NoSuchEntityException e)
@@ -93,12 +93,12 @@ namespace ShipItTest
         public void TestAddEmployees()
         {
             onSetUp();
-            var employeeBuilder = new EmployeeBuilder().setName(NAME);
-            var addEmployeesRequest = employeeBuilder.CreateAddEmployeesRequest();
+            EmployeeBuilder employeeBuilder = new EmployeeBuilder().setName(NAME);
+            AddEmployeesRequest addEmployeesRequest = employeeBuilder.CreateAddEmployeesRequest();
 
-            var response = employeeController.Post(addEmployeesRequest);
-            var databaseEmployee = employeeRepository.GetEmployeeByName(NAME);
-            var correctDatabaseEmploye = employeeBuilder.CreateEmployee();
+            Response response = employeeController.Post(addEmployeesRequest);
+            ShipIt.Models.DataModels.EmployeeDataModel databaseEmployee = employeeRepository.GetEmployeeByName(NAME);
+            Employee correctDatabaseEmploye = employeeBuilder.CreateEmployee();
 
             Assert.IsTrue(response.Success);
             Assert.IsTrue(EmployeesAreEqual(new Employee(databaseEmployee), correctDatabaseEmploye));
@@ -108,10 +108,10 @@ namespace ShipItTest
         public void TestDeleteEmployees()
         {
             onSetUp();
-            var employeeBuilder = new EmployeeBuilder().setName(NAME);
+            EmployeeBuilder employeeBuilder = new EmployeeBuilder().setName(NAME);
             employeeRepository.AddEmployees(new List<Employee>() { employeeBuilder.CreateEmployee() });
 
-            var removeEmployeeRequest = new RemoveEmployeeRequest() { Name = NAME };
+            RemoveEmployeeRequest removeEmployeeRequest = new RemoveEmployeeRequest() { Name = NAME };
             employeeController.Delete(removeEmployeeRequest);
 
             try
@@ -129,7 +129,7 @@ namespace ShipItTest
         public void TestDeleteNonexistentEmployee()
         {
             onSetUp();
-            var removeEmployeeRequest = new RemoveEmployeeRequest() { Name = NAME };
+            RemoveEmployeeRequest removeEmployeeRequest = new RemoveEmployeeRequest() { Name = NAME };
 
             try
             {
@@ -146,9 +146,9 @@ namespace ShipItTest
         public void TestAddDuplicateEmployee()
         {
             onSetUp();
-            var employeeBuilder = new EmployeeBuilder().setName(NAME);
+            EmployeeBuilder employeeBuilder = new EmployeeBuilder().setName(NAME);
             employeeRepository.AddEmployees(new List<Employee>() { employeeBuilder.CreateEmployee() });
-            var addEmployeesRequest = employeeBuilder.CreateAddEmployeesRequest();
+            AddEmployeesRequest addEmployeesRequest = employeeBuilder.CreateAddEmployeesRequest();
 
             try
             {

@@ -1,10 +1,9 @@
-﻿﻿using System;
+﻿using Npgsql;
+using ShipIt.Exceptions;
+using ShipIt.Models.DataModels;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Npgsql;
-using ShipIt.Exceptions;
-using ShipIt.Models.DataModels;
 
 namespace ShipIt.Repositories
 {
@@ -23,14 +22,14 @@ namespace ShipIt.Repositories
         public int GetCount()
         {
             string EmployeeCountSQL = "SELECT COUNT(*) FROM gcp";
-            return (int) QueryForLong(EmployeeCountSQL);
+            return (int)QueryForLong(EmployeeCountSQL);
         }
 
         public ProductDataModel GetProductByGtin(string gtin)
         {
 
             string sql = "SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE gtin_cd = @gtin_cd";
-            var parameter = new NpgsqlParameter("@gtin_cd", gtin);
+            NpgsqlParameter parameter = new NpgsqlParameter("@gtin_cd", gtin);
             return base.RunSingleGetQuery(sql, reader => new ProductDataModel(reader),
                 string.Format("No products found with gtin of value {0}", gtin), parameter);
         }
@@ -38,8 +37,8 @@ namespace ShipIt.Repositories
         public IEnumerable<ProductDataModel> GetProductsByGtin(List<string> gtins)
         {
 
-            string sql = String.Format("SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE gtin_cd IN ('{0}')", 
-                String.Join("','", gtins));
+            string sql = string.Format("SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE gtin_cd IN ('{0}')",
+                string.Join("','", gtins));
             return base.RunGetQuery(sql, reader => new ProductDataModel(reader), "No products found with given gtin ids", null);
         }
 
@@ -47,7 +46,7 @@ namespace ShipIt.Repositories
         {
 
             string sql = "SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE p_id = @p_id";
-            var parameter = new NpgsqlParameter("@p_id", id);
+            NpgsqlParameter parameter = new NpgsqlParameter("@p_id", id);
             string noProductWithIdErrorMessage = string.Format("No products found with id of value {0}", id.ToString());
             return RunSingleGetQuery(sql, reader => new ProductDataModel(reader), noProductWithIdErrorMessage, parameter);
         }
@@ -55,7 +54,7 @@ namespace ShipIt.Repositories
         public void DiscontinueProductByGtin(string gtin)
         {
             string sql = "UPDATE gtin SET ds = 1 WHERE gtin_cd = @gtin_cd";
-            var parameter = new NpgsqlParameter("@gtin_cd", gtin);
+            NpgsqlParameter parameter = new NpgsqlParameter("@gtin_cd", gtin);
             string noProductWithGtinErrorMessage =
                 string.Format("No products found with gtin of value {0}", gtin.ToString());
 
@@ -66,10 +65,10 @@ namespace ShipIt.Repositories
         {
             string sql = "INSERT INTO gtin (gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt) VALUES (@gtin_cd, @gcp_cd, @gtin_nm, @m_g, @l_th, @ds, @min_qt)";
 
-            var parametersList = new List<NpgsqlParameter[]>();
-            var gtins = new List<string>();
+            List<NpgsqlParameter[]> parametersList = new List<NpgsqlParameter[]>();
+            List<string> gtins = new List<string>();
 
-            foreach (var product in products)
+            foreach (ProductDataModel product in products)
             {
                 if (gtins.Contains(product.Gtin))
                 {
@@ -80,7 +79,7 @@ namespace ShipIt.Repositories
                 parametersList.Add(product.GetNpgsqlParameters().ToArray());
             }
 
-            var conflicts = TryGetProductsByGtin(gtins);
+            IEnumerable<ProductDataModel> conflicts = TryGetProductsByGtin(gtins);
             if (conflicts.Any())
             {
                 throw new MalformedRequestException(string.Format("Cannot add products with existing gtins: {0}",
@@ -94,7 +93,7 @@ namespace ShipIt.Repositories
         {
             try
             {
-                var products = GetProductsByGtin(gtins).ToList();
+                List<ProductDataModel> products = GetProductsByGtin(gtins).ToList();
                 return products;
             }
             catch (NoSuchEntityException)

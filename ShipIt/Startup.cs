@@ -40,7 +40,7 @@ namespace ShipIt_DotNetCore
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
-            
+
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>

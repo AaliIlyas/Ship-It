@@ -1,10 +1,9 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Repositories;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipIt.Controllers
 {
@@ -26,7 +25,7 @@ namespace ShipIt.Controllers
         {
             Log.Info($"Looking up employee by name: {name}");
 
-            var employee = new Employee(_employeeRepository.GetEmployeeByName(name));
+            Employee employee = new Employee(_employeeRepository.GetEmployeeByName(name));
 
             Log.Info("Found employee: " + employee);
             return new EmployeeResponse(employee);
@@ -35,14 +34,14 @@ namespace ShipIt.Controllers
         [HttpGet("{warehouseId}")]
         public EmployeeResponse Get([FromRoute] int warehouseId)
         {
-            Log.Info(String.Format("Looking up employee by id: {0}", warehouseId));
+            Log.Info(string.Format("Looking up employee by id: {0}", warehouseId));
 
-            var employees = _employeeRepository
+            IEnumerable<Employee> employees = _employeeRepository
                 .GetEmployeesByWarehouseId(warehouseId)
                 .Select(e => new Employee(e));
 
-            Log.Info(String.Format("Found employees: {0}", employees));
-            
+            Log.Info(string.Format("Found employees: {0}", employees));
+
             return new EmployeeResponse(employees);
         }
 

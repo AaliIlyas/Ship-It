@@ -16,10 +16,10 @@ namespace ShipIt.Controllers
 
     public class StatusController : ControllerBase
     {
-        private IEmployeeRepository employeeRepository;
-        private ICompanyRepository companyRepository;
-        private IProductRepository productRepository;
-        private IStockRepository stockRepository;
+        private readonly IEmployeeRepository employeeRepository;
+        private readonly ICompanyRepository companyRepository;
+        private readonly IProductRepository productRepository;
+        private readonly IStockRepository stockRepository;
 
         public StatusController(IEmployeeRepository employeeRepository, ICompanyRepository companyRepository, IProductRepository productRepository, IStockRepository stockRepository)
         {

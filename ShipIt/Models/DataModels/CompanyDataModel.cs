@@ -1,4 +1,4 @@
-﻿﻿using ShipIt.Models.ApiModels;
+﻿using ShipIt.Models.ApiModels;
 using System.Data;
 
 namespace ShipIt.Models.DataModels
@@ -24,21 +24,21 @@ namespace ShipIt.Models.DataModels
         [DatabaseColumnName("contact_mail")]
         public string Mail { get; set; }
 
-        public CompanyDataModel(IDataReader dataReader) :base(dataReader)
+        public CompanyDataModel(IDataReader dataReader) : base(dataReader)
         {
         }
 
         public CompanyDataModel(Company company)
         {
-            this.Gcp = company.Gcp;
-            this.Name = company.Name;
-            this.Addr2 = company.Addr2;
-            this.Addr3 = company.Addr3;
-            this.Addr4 = company.Addr4;
-            this.PostalCode = company.PostalCode;
-            this.City = company.City;
-            this.Tel = company.Tel;
-            this.Mail = company.Mail;
+            Gcp = company.Gcp;
+            Name = company.Name;
+            Addr2 = company.Addr2;
+            Addr3 = company.Addr3;
+            Addr4 = company.Addr4;
+            PostalCode = company.PostalCode;
+            City = company.City;
+            Tel = company.Tel;
+            Mail = company.Mail;
         }
     }
 }

@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using ShipIt.Models.ApiModels;
 using ShipIt.Models.DataModels;
 using ShipIt.Repositories;
 using ShipItTest.Builders;
+using System.Collections.Generic;
 
 namespace ShipItTest
 {
     public class StockControllerTests : AbstractBaseTest
     {
-        StockRepository stockRepository = new StockRepository();
-        CompanyRepository companyRepository = new CompanyRepository();
-        ProductRepository productRepository = new ProductRepository();
+        private readonly StockRepository stockRepository = new StockRepository();
+        private readonly CompanyRepository companyRepository = new CompanyRepository();
+        private readonly ProductRepository productRepository = new ProductRepository();
 
         private const string GTIN = "0000";
 
@@ -26,11 +26,11 @@ namespace ShipItTest
         public void TestAddNewStock()
         {
             onSetUp();
-            var productId = productRepository.GetProductByGtin(GTIN).Id;
+            int productId = productRepository.GetProductByGtin(GTIN).Id;
 
-            stockRepository.AddStock(1, new List<StockAlteration>(){new StockAlteration(productId, 1)});
+            stockRepository.AddStock(1, new List<StockAlteration>() { new StockAlteration(productId, 1) });
 
-            var databaseStock = stockRepository.GetStockByWarehouseAndProductIds(1, new List<int>(){productId});
+            Dictionary<int, StockDataModel> databaseStock = stockRepository.GetStockByWarehouseAndProductIds(1, new List<int>() { productId });
             Assert.AreEqual(databaseStock[productId].held, 1);
         }
 
@@ -38,12 +38,12 @@ namespace ShipItTest
         public void TestUpdateExistingStock()
         {
             onSetUp();
-            var productId = productRepository.GetProductByGtin(GTIN).Id;
+            int productId = productRepository.GetProductByGtin(GTIN).Id;
             stockRepository.AddStock(1, new List<StockAlteration>() { new StockAlteration(productId, 2) });
 
             stockRepository.AddStock(1, new List<StockAlteration>() { new StockAlteration(productId, 5) });
 
-            var databaseStock = stockRepository.GetStockByWarehouseAndProductIds(1, new List<int>() { productId });
+            Dictionary<int, StockDataModel> databaseStock = stockRepository.GetStockByWarehouseAndProductIds(1, new List<int>() { productId });
             Assert.AreEqual(databaseStock[productId].held, 7);
         }
     }

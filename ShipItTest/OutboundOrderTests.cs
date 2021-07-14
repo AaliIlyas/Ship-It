@@ -1,27 +1,27 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using ShipIt.Controllers;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Models.DataModels;
 using ShipIt.Repositories;
 using ShipItTest.Builders;
+using System.Collections.Generic;
 
 namespace ShipItTest
 {
     public class OutboundOrderControllerTests : AbstractBaseTest
     {
-        OutboundOrderController outboundOrderController = new OutboundOrderController(
+        private readonly OutboundOrderController outboundOrderController = new OutboundOrderController(
             new StockRepository(),
             new ProductRepository()
         );
-        StockRepository stockRepository = new StockRepository();
-        CompanyRepository companyRepository = new CompanyRepository();
-        ProductRepository productRepository = new ProductRepository();
-        EmployeeRepository employeeRepository = new EmployeeRepository();
+        private readonly StockRepository stockRepository = new StockRepository();
+        private readonly CompanyRepository companyRepository = new CompanyRepository();
+        private readonly ProductRepository productRepository = new ProductRepository();
+        private readonly EmployeeRepository employeeRepository = new EmployeeRepository();
 
-        private static Employee EMPLOYEE = new EmployeeBuilder().CreateEmployee();
-        private static Company COMPANY = new CompanyBuilder().CreateCompany();
+        private static readonly Employee EMPLOYEE = new EmployeeBuilder().CreateEmployee();
+        private static readonly Company COMPANY = new CompanyBuilder().CreateCompany();
         private static readonly int WAREHOUSE_ID = EMPLOYEE.WarehouseId;
 
         private Product product;
@@ -33,7 +33,7 @@ namespace ShipItTest
             base.onSetUp();
             employeeRepository.AddEmployees(new List<Employee>() { EMPLOYEE });
             companyRepository.AddCompanies(new List<Company>() { COMPANY });
-            var productDataModel = new ProductBuilder().setGtin(GTIN).CreateProductDatabaseModel();
+            ProductDataModel productDataModel = new ProductBuilder().setGtin(GTIN).CreateProductDatabaseModel();
             productRepository.AddProducts(new List<ProductDataModel>() { productDataModel });
             product = new Product(productRepository.GetProductByGtin(GTIN));
             productId = product.Id;
@@ -44,22 +44,22 @@ namespace ShipItTest
         {
             onSetUp();
             stockRepository.AddStock(WAREHOUSE_ID, new List<StockAlteration>() { new StockAlteration(productId, 10) });
-            var outboundOrder = new OutboundOrderRequestModel()
+            OutboundOrderRequestModel outboundOrder = new OutboundOrderRequestModel()
             {
                 WarehouseId = WAREHOUSE_ID,
                 OrderLines = new List<OrderLine>()
                 {
                     new OrderLine()
                     {
-                        gtin = GTIN,
-                        quantity = 3
+                        Gtin = GTIN,
+                        Quantity = 3
                     }
                 }
             };
 
             outboundOrderController.Post(outboundOrder);
 
-            var stock = stockRepository.GetStockByWarehouseAndProductIds(WAREHOUSE_ID, new List<int>() { productId })[productId];
+            StockDataModel stock = stockRepository.GetStockByWarehouseAndProductIds(WAREHOUSE_ID, new List<int>() { productId })[productId];
             Assert.AreEqual(stock.held, 7);
         }
 
@@ -68,15 +68,15 @@ namespace ShipItTest
         {
             onSetUp();
             stockRepository.AddStock(WAREHOUSE_ID, new List<StockAlteration>() { new StockAlteration(productId, 10) });
-            var outboundOrder = new OutboundOrderRequestModel()
+            OutboundOrderRequestModel outboundOrder = new OutboundOrderRequestModel()
             {
                 WarehouseId = WAREHOUSE_ID,
                 OrderLines = new List<OrderLine>()
                 {
                     new OrderLine()
                     {
-                        gtin = GTIN,
-                        quantity = 11
+                        Gtin = GTIN,
+                        Quantity = 11
                     }
                 }
             };
@@ -96,24 +96,24 @@ namespace ShipItTest
         public void TestOutboundOrderStockNotHeld()
         {
             onSetUp();
-            var noStockGtin = GTIN + "XYZ";
+            string noStockGtin = GTIN + "XYZ";
             productRepository.AddProducts(new List<ProductDataModel>() { new ProductBuilder().setGtin(noStockGtin).CreateProductDatabaseModel() });
             stockRepository.AddStock(WAREHOUSE_ID, new List<StockAlteration>() { new StockAlteration(productId, 10) });
 
-            var outboundOrder = new OutboundOrderRequestModel()
+            OutboundOrderRequestModel outboundOrder = new OutboundOrderRequestModel()
             {
                 WarehouseId = WAREHOUSE_ID,
                 OrderLines = new List<OrderLine>()
                 {
                     new OrderLine()
                     {
-                        gtin = GTIN,
-                        quantity = 8
+                        Gtin = GTIN,
+                        Quantity = 8
                     },
                     new OrderLine()
                     {
-                        gtin = noStockGtin,
-                        quantity = 1000
+                        Gtin = noStockGtin,
+                        Quantity = 1000
                     }
                 }
             };
@@ -134,22 +134,22 @@ namespace ShipItTest
         public void TestOutboundOrderBadGtin()
         {
             onSetUp();
-            var badGtin = GTIN + "XYZ";
+            string badGtin = GTIN + "XYZ";
 
-            var outboundOrder = new OutboundOrderRequestModel()
+            OutboundOrderRequestModel outboundOrder = new OutboundOrderRequestModel()
             {
                 WarehouseId = WAREHOUSE_ID,
                 OrderLines = new List<OrderLine>()
                 {
                     new OrderLine()
                     {
-                        gtin = GTIN,
-                        quantity = 1
+                        Gtin = GTIN,
+                        Quantity = 1
                     },
                     new OrderLine()
                     {
-                        gtin = badGtin,
-                        quantity = 1
+                        Gtin = badGtin,
+                        Quantity = 1
                     }
                 }
             };
@@ -170,20 +170,20 @@ namespace ShipItTest
         {
             onSetUp();
             stockRepository.AddStock(WAREHOUSE_ID, new List<StockAlteration>() { new StockAlteration(productId, 10) });
-            var outboundOrder = new OutboundOrderRequestModel()
+            OutboundOrderRequestModel outboundOrder = new OutboundOrderRequestModel()
             {
                 WarehouseId = WAREHOUSE_ID,
                 OrderLines = new List<OrderLine>()
                 {
                     new OrderLine()
                     {
-                        gtin = GTIN,
-                        quantity = 1
+                        Gtin = GTIN,
+                        Quantity = 1
                     },
                     new OrderLine()
                     {
-                        gtin = GTIN,
-                        quantity = 1
+                        Gtin = GTIN,
+                        Quantity = 1
                     }
                 }
             };

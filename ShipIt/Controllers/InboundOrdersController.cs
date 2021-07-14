@@ -1,11 +1,11 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Models.DataModels;
 using ShipIt.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipIt.Controllers
 {
@@ -32,28 +32,28 @@ namespace ShipIt.Controllers
         {
             Log.Info("orderIn for warehouseId: " + warehouseId);
 
-            var operationsManager = new Employee(_employeeRepository.GetOperationsManager(warehouseId));
+            Employee operationsManager = new Employee(_employeeRepository.GetOperationsManager(warehouseId));
 
-            Log.Debug(String.Format("Found operations manager: {0}", operationsManager));
+            Log.Debug(string.Format("Found operations manager: {0}", operationsManager));
 
-            var allStock = _stockRepository.GetStockByWarehouseId(warehouseId);
+            IEnumerable<StockDataModel> allStock = _stockRepository.GetStockByWarehouseId(warehouseId);
 
             Dictionary<Company, List<InboundOrderLine>> orderlinesByCompany = new Dictionary<Company, List<InboundOrderLine>>();
-            foreach (var stock in allStock)
+            foreach (StockDataModel stock in allStock)
             {
                 Product product = new Product(_productRepository.GetProductById(stock.ProductId));
-                if(stock.held < product.LowerThreshold && !product.Discontinued)
+                if (stock.held < product.LowerThreshold && !product.Discontinued)
                 {
                     Company company = new Company(_companyRepository.GetCompany(product.Gcp));
 
-                    var orderQuantity = Math.Max(product.LowerThreshold * 3 - stock.held, product.MinimumOrderQuantity);
+                    int orderQuantity = Math.Max(product.LowerThreshold * 3 - stock.held, product.MinimumOrderQuantity);
 
                     if (!orderlinesByCompany.ContainsKey(company))
                     {
                         orderlinesByCompany.Add(company, new List<InboundOrderLine>());
                     }
 
-                    orderlinesByCompany[company].Add( 
+                    orderlinesByCompany[company].Add(
                         new InboundOrderLine()
                         {
                             gtin = product.Gtin,
@@ -63,9 +63,9 @@ namespace ShipIt.Controllers
                 }
             }
 
-            Log.Debug(String.Format("Constructed order lines: {0}", orderlinesByCompany));
+            Log.Debug(string.Format("Constructed order lines: {0}", orderlinesByCompany));
 
-            var orderSegments = orderlinesByCompany.Select(ol => new OrderSegment()
+            IEnumerable<OrderSegment> orderSegments = orderlinesByCompany.Select(ol => new OrderSegment()
             {
                 OrderLines = ol.Value,
                 Company = ol.Key
@@ -86,52 +86,52 @@ namespace ShipIt.Controllers
         {
             Log.Info("Processing manifest: " + requestModel);
 
-            var gtins = new List<string>();
+            List<string> gtins = new List<string>();
 
-            foreach (var orderLine in requestModel.OrderLines)
+            foreach (OrderLine orderLine in requestModel.OrderLines)
             {
-                if (gtins.Contains(orderLine.gtin))
+                if (gtins.Contains(orderLine.Gtin))
                 {
-                    throw new ValidationException(String.Format("Manifest contains duplicate product gtin: {0}", orderLine.gtin));
+                    throw new ValidationException(string.Format("Manifest contains duplicate product gtin: {0}", orderLine.Gtin));
                 }
-                gtins.Add(orderLine.gtin);
+                gtins.Add(orderLine.Gtin);
             }
 
             IEnumerable<ProductDataModel> productDataModels = _productRepository.GetProductsByGtin(gtins);
             Dictionary<string, Product> products = productDataModels.ToDictionary(p => p.Gtin, p => new Product(p));
 
-            Log.Debug(String.Format("Retrieved products to verify manifest: {0}", products));
+            Log.Debug(string.Format("Retrieved products to verify manifest: {0}", products));
 
-            var lineItems = new List<StockAlteration>();
-            var errors = new List<string>();
+            List<StockAlteration> lineItems = new List<StockAlteration>();
+            List<string> errors = new List<string>();
 
-            foreach (var orderLine in requestModel.OrderLines)
+            foreach (OrderLine orderLine in requestModel.OrderLines)
             {
-                if (!products.ContainsKey(orderLine.gtin))
+                if (!products.ContainsKey(orderLine.Gtin))
                 {
-                    errors.Add(String.Format("Unknown product gtin: {0}", orderLine.gtin));
+                    errors.Add(string.Format("Unknown product gtin: {0}", orderLine.Gtin));
                     continue;
                 }
 
-                Product product = products[orderLine.gtin];
+                Product product = products[orderLine.Gtin];
                 if (!product.Gcp.Equals(requestModel.Gcp))
                 {
-                    errors.Add(String.Format("Manifest GCP ({0}) doesn't match Product GCP ({1})",
+                    errors.Add(string.Format("Manifest GCP ({0}) doesn't match Product GCP ({1})",
                         requestModel.Gcp, product.Gcp));
                 }
                 else
                 {
-                    lineItems.Add(new StockAlteration(product.Id, orderLine.quantity));
+                    lineItems.Add(new StockAlteration(product.Id, orderLine.Quantity));
                 }
             }
 
             if (errors.Count() > 0)
             {
-                Log.Debug(String.Format("Found errors with inbound manifest: {0}", errors));
-                throw new ValidationException(String.Format("Found inconsistencies in the inbound manifest: {0}", String.Join("; ", errors)));
+                Log.Debug(string.Format("Found errors with inbound manifest: {0}", errors));
+                throw new ValidationException(string.Format("Found inconsistencies in the inbound manifest: {0}", string.Join("; ", errors)));
             }
 
-            Log.Debug(String.Format("Increasing stock levels with manifest: {0}", requestModel));
+            Log.Debug(string.Format("Increasing stock levels with manifest: {0}", requestModel));
             _stockRepository.AddStock(requestModel.WarehouseId, lineItems);
             Log.Info("Stock levels increased");
         }

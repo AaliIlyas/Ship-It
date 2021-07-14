@@ -1,4 +1,4 @@
-﻿﻿namespace ShipIt.Models.ApiModels
+﻿namespace ShipIt.Models.ApiModels
 {
     public static class DataBaseRoles
     {

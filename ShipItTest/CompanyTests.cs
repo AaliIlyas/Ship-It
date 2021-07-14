@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using ShipIt.Controllers;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Repositories;
 using ShipItTest.Builders;
+using System.Collections.Generic;
 
 namespace ShipItTest
 {
     public class CompanyControllerTests : AbstractBaseTest
     {
-        CompanyController companyController = new CompanyController(new CompanyRepository());
-        CompanyRepository companyRepository = new CompanyRepository();
+        private readonly CompanyController companyController = new CompanyController(new CompanyRepository());
+        private readonly CompanyRepository companyRepository = new CompanyRepository();
 
         private const string GCP = "0000346";
 
@@ -19,7 +19,7 @@ namespace ShipItTest
         public void TestRoundtripCompanyRepository()
         {
             onSetUp();
-            var company = new CompanyBuilder().CreateCompany();
+            Company company = new CompanyBuilder().CreateCompany();
             companyRepository.AddCompanies(new List<Company>() { company });
             Assert.AreEqual(companyRepository.GetCompany(company.Gcp).Name, company.Name);
         }
@@ -28,11 +28,11 @@ namespace ShipItTest
         public void TestGetCompanyByGcp()
         {
             onSetUp();
-            var companyBuilder = new CompanyBuilder().setGcp(GCP);
+            CompanyBuilder companyBuilder = new CompanyBuilder().setGcp(GCP);
             companyRepository.AddCompanies(new List<Company>() { companyBuilder.CreateCompany() });
-            var result = companyController.Get(GCP);
+            CompanyResponse result = companyController.Get(GCP);
 
-            var correctCompany = companyBuilder.CreateCompany();
+            Company correctCompany = companyBuilder.CreateCompany();
             Assert.IsTrue(CompaniesAreEqual(correctCompany, result.Company));
             Assert.IsTrue(result.Success);
         }
@@ -56,12 +56,12 @@ namespace ShipItTest
         public void TestAddCompanies()
         {
             onSetUp();
-            var companyBuilder = new CompanyBuilder().setGcp(GCP);
-            var addCompaniesRequest = companyBuilder.CreateAddCompaniesRequest();
+            CompanyBuilder companyBuilder = new CompanyBuilder().setGcp(GCP);
+            AddCompaniesRequest addCompaniesRequest = companyBuilder.CreateAddCompaniesRequest();
 
-            var response = companyController.Post(addCompaniesRequest);
-            var databaseCompany = companyRepository.GetCompany(GCP);
-            var correctCompany = companyBuilder.CreateCompany();
+            Response response = companyController.Post(addCompaniesRequest);
+            ShipIt.Models.DataModels.CompanyDataModel databaseCompany = companyRepository.GetCompany(GCP);
+            Company correctCompany = companyBuilder.CreateCompany();
 
             Assert.IsTrue(response.Success);
             Assert.IsTrue(CompaniesAreEqual(new Company(databaseCompany), correctCompany));

@@ -1,11 +1,9 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using Npgsql;
+﻿using Npgsql;
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Models.DataModels;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ShipIt.Repositories
 {
@@ -37,7 +35,7 @@ namespace ShipIt.Repositories
         public IEnumerable<StockDataModel> GetStockByWarehouseId(int id)
         {
             string sql = "SELECT p_id, hld, w_id FROM stock WHERE w_id = @w_id";
-            var parameter = new NpgsqlParameter("@w_id", id);
+            NpgsqlParameter parameter = new NpgsqlParameter("@w_id", id);
             string noProductWithIdErrorMessage = string.Format("No stock found with w_id: {0}", id);
             try
             {
@@ -52,18 +50,18 @@ namespace ShipIt.Repositories
         public Dictionary<int, StockDataModel> GetStockByWarehouseAndProductIds(int warehouseId, List<int> productIds)
         {
             string sql = string.Format("SELECT p_id, hld, w_id FROM stock WHERE w_id = @w_id AND p_id IN ({0})",
-                String.Join(",", productIds));
-            var parameter = new NpgsqlParameter("@w_id", warehouseId);
+                string.Join(",", productIds));
+            NpgsqlParameter parameter = new NpgsqlParameter("@w_id", warehouseId);
             string noProductWithIdErrorMessage = string.Format("No stock found with w_id: {0} and p_ids: {1}",
-                warehouseId, String.Join(",", productIds));
-            var stock = base.RunGetQuery(sql, reader => new StockDataModel(reader), noProductWithIdErrorMessage, parameter);
+                warehouseId, string.Join(",", productIds));
+            IEnumerable<StockDataModel> stock = base.RunGetQuery(sql, reader => new StockDataModel(reader), noProductWithIdErrorMessage, parameter);
             return stock.ToDictionary(s => s.ProductId, s => s);
         }
-            
+
         public void AddStock(int warehouseId, List<StockAlteration> lineItems)
         {
-            var parametersList = new List<NpgsqlParameter[]>();
-            foreach (var orderLine in lineItems)
+            List<NpgsqlParameter[]> parametersList = new List<NpgsqlParameter[]>();
+            foreach (StockAlteration orderLine in lineItems)
             {
                 parametersList.Add(
                     new NpgsqlParameter[] {
@@ -76,12 +74,12 @@ namespace ShipIt.Repositories
             string sql = "INSERT INTO stock (p_id, w_id, hld) VALUES (@p_id, @w_id, @hld) "
                          + "ON CONFLICT (p_id, w_id) DO UPDATE SET hld = stock.hld + EXCLUDED.hld";
 
-            var recordsAffected = new List<int>();
-            foreach (var parameters in parametersList)
+            List<int> recordsAffected = new List<int>();
+            foreach (NpgsqlParameter[] parameters in parametersList)
             {
-                 recordsAffected.Add(
-                     RunSingleQueryAndReturnRecordsAffected(sql, parameters)
-                 );
+                recordsAffected.Add(
+                    RunSingleQueryAndReturnRecordsAffected(sql, parameters)
+                );
             }
 
             string errorMessage = null;
@@ -90,7 +88,7 @@ namespace ShipIt.Repositories
             {
                 if (recordsAffected[i] == 0)
                 {
-                    errorMessage = String.Format("Product {0} in warehouse {1} was unexpectedly not updated (rows updated returned {2})",
+                    errorMessage = string.Format("Product {0} in warehouse {1} was unexpectedly not updated (rows updated returned {2})",
                         parametersList[i][0], warehouseId, recordsAffected[i]);
                 }
             }
@@ -106,8 +104,8 @@ namespace ShipIt.Repositories
             string sql = string.Format("UPDATE stock SET hld = hld - @hld WHERE w_id = {0} AND p_id = @p_id",
                 warehouseId);
 
-            var parametersList = new List<NpgsqlParameter[]>();
-            foreach (var lineItem in lineItems)
+            List<NpgsqlParameter[]> parametersList = new List<NpgsqlParameter[]>();
+            foreach (StockAlteration lineItem in lineItems)
             {
                 parametersList.Add(new NpgsqlParameter[]
                 {

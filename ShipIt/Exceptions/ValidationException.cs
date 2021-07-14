@@ -1,4 +1,4 @@
-﻿﻿namespace ShipIt.Exceptions
+﻿namespace ShipIt.Exceptions
 {
     public class ValidationException : MalformedRequestException
     {

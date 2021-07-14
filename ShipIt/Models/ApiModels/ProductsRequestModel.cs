@@ -1,5 +1,5 @@
-﻿﻿using System.Collections.Generic;
-using ShipIt.Parsers;
+﻿using ShipIt.Parsers;
+using System.Collections.Generic;
 
 namespace ShipIt.Controllers
 {

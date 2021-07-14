@@ -1,5 +1,4 @@
-﻿﻿using ShipIt.Models.DataModels;
-using System;
+﻿using ShipIt.Models.DataModels;
 using System.Text;
 
 namespace ShipIt.Models.ApiModels
@@ -63,7 +62,7 @@ namespace ShipIt.Models.ApiModels
         {
             unchecked
             {
-                var hashCode = (Gcp != null ? Gcp.GetHashCode() : 0);
+                int hashCode = (Gcp != null ? Gcp.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Addr2 != null ? Addr2.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Addr3 != null ? Addr3.GetHashCode() : 0);
@@ -76,7 +75,7 @@ namespace ShipIt.Models.ApiModels
             }
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             return new StringBuilder()
                 .AppendFormat("gcp: {0}, ", Gcp)

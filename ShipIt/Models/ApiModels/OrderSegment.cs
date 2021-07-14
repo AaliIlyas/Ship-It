@@ -1,7 +1,4 @@
-﻿﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace ShipIt.Models.ApiModels
 {
@@ -15,6 +12,6 @@ namespace ShipIt.Models.ApiModels
     public class OrderSegment
     {
         public List<InboundOrderLine> OrderLines { get; set; }
-        public Company Company { get; set; } 
+        public Company Company { get; set; }
     }
 }

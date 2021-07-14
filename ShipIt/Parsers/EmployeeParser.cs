@@ -1,9 +1,4 @@
-﻿﻿using System.Collections.Generic;
-using System.Linq;
-using ShipIt.Exceptions;
-using ShipIt.Models.ApiModels;
-
-namespace ShipIt.Parsers
+﻿namespace ShipIt.Parsers
 {
     public class EmployeeRequestModel
     {
