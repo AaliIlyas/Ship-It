@@ -32,19 +32,19 @@ namespace ShipIt.Controllers
         {
             Log.Info("orderIn for warehouseId: " + warehouseId);
 
-            Employee operationsManager = new Employee(_employeeRepository.GetOperationsManager(warehouseId));
+            var operationsManager = _employeeRepository.GetOperationsManager(warehouseId);
 
             Log.Debug(string.Format("Found operations manager: {0}", operationsManager));
 
-            IEnumerable<StockDataModel> allStock = _stockRepository.GetStockByWarehouseId(warehouseId);
+            var allStock = _stockRepository.GetStockByWarehouseId(warehouseId);
 
-            Dictionary<Company, List<InboundOrderLine>> orderlinesByCompany = new Dictionary<Company, List<InboundOrderLine>>();
+            var orderlinesByCompany = new Dictionary<CompanyDataModel, List<InboundOrderLine>>();
             foreach (StockDataModel stock in allStock)
             {
-                Product product = new Product(_productRepository.GetProductById(stock.ProductId));
-                if (stock.held < product.LowerThreshold && !product.Discontinued)
+                var product = _productRepository.GetProductById(stock.ProductId);
+                if (stock.held < product.LowerThreshold && product.Discontinued!=1)
                 {
-                    Company company = new Company(_companyRepository.GetCompany(product.Gcp));
+                    var company = _companyRepository.GetCompany(product.Gcp);
 
                     int orderQuantity = Math.Max(product.LowerThreshold * 3 - stock.held, product.MinimumOrderQuantity);
 
@@ -53,29 +53,32 @@ namespace ShipIt.Controllers
                         orderlinesByCompany.Add(company, new List<InboundOrderLine>());
                     }
 
+
+                    //Select(Products.where wid==warehouseId).Include(Employees.where wid==warehouseId)
+
                     orderlinesByCompany[company].Add(
                         new InboundOrderLine()
                         {
-                            gtin = product.Gtin,
-                            name = product.Name,
-                            quantity = orderQuantity
+                            Gtin = product.Gtin,
+                            Name = product.Name,
+                            Quantity = orderQuantity
                         });
                 }
             }
 
             Log.Debug(string.Format("Constructed order lines: {0}", orderlinesByCompany));
 
-            IEnumerable<OrderSegment> orderSegments = orderlinesByCompany.Select(ol => new OrderSegment()
+            var orderSegments = orderlinesByCompany.Select(ol => new OrderSegment()
             {
                 OrderLines = ol.Value,
-                Company = ol.Key
+                Company = new Company(ol.Key)
             });
 
             Log.Info("Constructed inbound order");
 
             return new InboundOrderResponse()
             {
-                OperationsManager = operationsManager,
+                OperationsManager = new Employee(operationsManager),
                 WarehouseId = warehouseId,
                 OrderSegments = orderSegments
             };

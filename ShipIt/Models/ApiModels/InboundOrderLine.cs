@@ -2,9 +2,9 @@
 {
     public class InboundOrderLine
     {
-        public string gtin { get; set; }
-        public string name { get; set; }
-        public int quantity { get; set; }
+        public string Gtin { get; set; }
+        public string Name { get; set; }
+        public int Quantity { get; set; }
 
         public InboundOrderLine()
         {
