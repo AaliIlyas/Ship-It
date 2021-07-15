@@ -9,30 +9,6 @@ using System.Linq;
 
 namespace ShipIt.Controllers
 {
-    public class StockInfoDataModel
-    {
-        public int ProductId { get; set; }
-        public int WarehouseId { get; set; }
-        public int Held { get; set; }
-        private readonly ICompanyRepository _companyRepository;
-        private readonly IProductRepository _productRepository;
-        public ProductDataModel Product { get; set; }
-        public CompanyDataModel Company { get; set; }
-
-        public StockInfoDataModel(IProductRepository productRepository, ICompanyRepository companyRepository, StockDataModel stock, int warehouseId)
-        {
-            _companyRepository = companyRepository;
-            _productRepository = productRepository;
-
-            ProductId = stock.ProductId;
-            WarehouseId = warehouseId;
-            Held = stock.held;
-
-            Product = _productRepository.GetProductById(ProductId);
-            Company = _companyRepository.GetCompany(Product.Gcp);
-        }
-    }
-
     [Route("orders/inbound")]
     public class InboundOrderController : ControllerBase
     {
@@ -61,14 +37,13 @@ namespace ShipIt.Controllers
             Log.Debug(string.Format("Found operations manager: {0}", operationsManager));
 
             var allStock = _stockRepository.GetStockByWarehouseId(warehouseId)
-                .Select(stock => new StockInfoDataModel(_productRepository, _companyRepository, stock, warehouseId));
+                .Select(stock => new StockInfoViewModel(_productRepository, _companyRepository, stock, warehouseId));
 
             var orderlinesByCompany = new Dictionary<CompanyDataModel, List<InboundOrderLine>>();
-            foreach (StockInfoDataModel stock in allStock)
+            foreach (StockInfoViewModel stock in allStock)
             {
                 if (stock.Held < stock.Product.LowerThreshold && stock.Product.Discontinued != 1)
                 {
-
                     int orderQuantity = Math.Max(stock.Product.LowerThreshold * 3 - stock.Held, stock.Product.MinimumOrderQuantity);
 
                     if (!orderlinesByCompany.ContainsKey(stock.Company))
