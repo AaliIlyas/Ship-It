@@ -9,6 +9,30 @@ using System.Linq;
 
 namespace ShipIt.Controllers
 {
+    public class StockInfoDataModel
+    {
+        public int ProductId { get; set; }
+        public int WarehouseId { get; set; }
+        public int Held { get; set; }
+        private readonly ICompanyRepository _companyRepository;
+        private readonly IProductRepository _productRepository;
+        public ProductDataModel Product { get; set; }
+        public CompanyDataModel Company { get; set; }
+
+        public StockInfoDataModel(IProductRepository productRepository, ICompanyRepository companyRepository, StockDataModel stock, int warehouseId)
+        {
+            _companyRepository = companyRepository;
+            _productRepository = productRepository;
+
+            ProductId = stock.ProductId;
+            WarehouseId = warehouseId;
+            Held = stock.held;
+
+            Product = _productRepository.GetProductById(ProductId);
+            Company = _companyRepository.GetCompany(Product.Gcp);
+        }
+    }
+
     [Route("orders/inbound")]
     public class InboundOrderController : ControllerBase
     {
@@ -22,8 +46,8 @@ namespace ShipIt.Controllers
         public InboundOrderController(IEmployeeRepository employeeRepository, ICompanyRepository companyRepository, IProductRepository productRepository, IStockRepository stockRepository)
         {
             _employeeRepository = employeeRepository;
-            _stockRepository = stockRepository;
             _companyRepository = companyRepository;
+            _stockRepository = stockRepository;
             _productRepository = productRepository;
         }
 
@@ -36,30 +60,27 @@ namespace ShipIt.Controllers
 
             Log.Debug(string.Format("Found operations manager: {0}", operationsManager));
 
-            var allStock = _stockRepository.GetStockByWarehouseId(warehouseId);
+            var allStock = _stockRepository.GetStockByWarehouseId(warehouseId)
+                .Select(stock => new StockInfoDataModel(_productRepository, _companyRepository, stock, warehouseId));
 
             var orderlinesByCompany = new Dictionary<CompanyDataModel, List<InboundOrderLine>>();
-            foreach (StockDataModel stock in allStock)
+            foreach (StockInfoDataModel stock in allStock)
             {
-                var product = _productRepository.GetProductById(stock.ProductId);
-                if (stock.held < product.LowerThreshold && product.Discontinued != 1)
+                if (stock.Held < stock.Product.LowerThreshold && stock.Product.Discontinued != 1)
                 {
-                    var company = _companyRepository.GetCompany(product.Gcp);
 
-                    int orderQuantity = Math.Max(product.LowerThreshold * 3 - stock.held, product.MinimumOrderQuantity);
+                    int orderQuantity = Math.Max(stock.Product.LowerThreshold * 3 - stock.Held, stock.Product.MinimumOrderQuantity);
 
-                    if (!orderlinesByCompany.ContainsKey(company))
+                    if (!orderlinesByCompany.ContainsKey(stock.Company))
                     {
-                        orderlinesByCompany.Add(company, new List<InboundOrderLine>());
+                        orderlinesByCompany.Add(stock.Company, new List<InboundOrderLine>());
                     }
 
-                    //Select(Products.where wid==warehouseId).Include(Employees.where wid==warehouseId)
-
-                    orderlinesByCompany[company].Add(
+                    orderlinesByCompany[stock.Company].Add(
                         new InboundOrderLine()
                         {
-                            Gtin = product.Gtin,
-                            Name = product.Name,
+                            Gtin = stock.Product.Gtin,
+                            Name = stock.Product.Name,
                             Quantity = orderQuantity
                         });
                 }
