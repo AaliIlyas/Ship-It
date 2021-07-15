@@ -44,11 +44,17 @@ namespace ShipIt.Repositories
 
         public ProductDataModel GetProductById(int id)
         {
-
             string sql = "SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE p_id = @p_id";
             NpgsqlParameter parameter = new NpgsqlParameter("@p_id", id);
             string noProductWithIdErrorMessage = string.Format("No products found with id of value {0}", id.ToString());
             return RunSingleGetQuery(sql, reader => new ProductDataModel(reader), noProductWithIdErrorMessage, parameter);
+        }
+
+        public IEnumerable<ProductDataModel> GetProductByIds(List<int> ids)
+        {
+            string sql = string.Format("SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE gtin_cd IN ('{0}')",
+                string.Join("','", ids));
+            return RunGetQuery(sql, reader => new ProductDataModel(reader), "No products found with given gtin ids", null);
         }
 
         public void DiscontinueProductByGtin(string gtin)
