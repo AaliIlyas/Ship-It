@@ -37,14 +37,19 @@ namespace ShipIt.Controllers
             Log.Debug(string.Format("Found operations manager: {0}", operationsManager));
 
             var allStock = _stockRepository.GetStockByWarehouseId(warehouseId)
-                .Select(stock => new StockInfoViewModel(_productRepository, _companyRepository, stock, warehouseId));
+                .Select(stock => 
+                {
+                    var product = _productRepository.GetProductById(stock.ProductId);
+                    var company = _companyRepository.GetCompany(product.Gcp);
+                    return new StockInfoViewModel(product, company, stock, warehouseId);
+                });
 
             var orderlinesByCompany = new Dictionary<CompanyDataModel, List<InboundOrderLine>>();
             foreach (StockInfoViewModel stock in allStock)
             {
                 if (stock.Held < stock.Product.LowerThreshold && stock.Product.Discontinued != 1)
                 {
-                    int orderQuantity = Math.Max(stock.Product.LowerThreshold * 3 - stock.Held, stock.Product.MinimumOrderQuantity);
+                    var orderQuantity = Math.Max(stock.Product.LowerThreshold * 3 - stock.Held, stock.Product.MinimumOrderQuantity);
 
                     if (!orderlinesByCompany.ContainsKey(stock.Company))
                     {
