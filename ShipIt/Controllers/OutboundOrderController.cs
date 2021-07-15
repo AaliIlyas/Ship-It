@@ -107,6 +107,8 @@ namespace ShipIt.Controllers
                 totalWeight += item.StockAlterationWeight;
             }
 
+            var trucks = Convert.ToInt32(Math.Ceiling(totalWeight / 2000));
+
             return new OutBoundOrder()
             {
                 Trucks = Convert.ToInt32(Math.Ceiling(totalWeight / 2000))

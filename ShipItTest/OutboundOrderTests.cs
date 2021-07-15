@@ -5,6 +5,7 @@ using ShipIt.Models.ApiModels;
 using ShipIt.Models.DataModels;
 using ShipIt.Repositories;
 using ShipItTest.Builders;
+using System;
 using System.Collections.Generic;
 
 namespace ShipItTest
@@ -57,10 +58,12 @@ namespace ShipItTest
                 }
             };
 
-            outboundOrderController.Post(outboundOrder);
+            var output = outboundOrderController.Post(outboundOrder);
+            //Console.WriteLine(output);
 
             StockDataModel stock = stockRepository.GetStockByWarehouseAndProductIds(WAREHOUSE_ID, new List<int>() { productId })[productId];
             Assert.AreEqual(stock.held, 7);
+            Assert.AreEqual(1, output.Trucks);
         }
 
         [Test]

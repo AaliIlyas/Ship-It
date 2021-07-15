@@ -42,7 +42,7 @@ namespace ShipIt.Controllers
             foreach (StockDataModel stock in allStock)
             {
                 var product = _productRepository.GetProductById(stock.ProductId);
-                if (stock.held < product.LowerThreshold && product.Discontinued!=1)
+                if (stock.held < product.LowerThreshold && product.Discontinued != 1)
                 {
                     var company = _companyRepository.GetCompany(product.Gcp);
 
@@ -52,7 +52,6 @@ namespace ShipIt.Controllers
                     {
                         orderlinesByCompany.Add(company, new List<InboundOrderLine>());
                     }
-
 
                     //Select(Products.where wid==warehouseId).Include(Employees.where wid==warehouseId)
 
