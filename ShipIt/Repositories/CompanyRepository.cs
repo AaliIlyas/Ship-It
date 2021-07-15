@@ -11,7 +11,7 @@ namespace ShipIt.Repositories
         int GetCount();
         CompanyDataModel GetCompanyByGcp(string gcp);
         void AddCompanies(IEnumerable<Company> companies);
-        IEnumerable<CompanyDataModel> GetCompaniesByGcps(List<string> gcp);
+        List<CompanyDataModel> GetCompaniesByGcps(List<string> gcp);
     }
 
     public class CompanyRepository : RepositoryBase, ICompanyRepository
@@ -37,9 +37,14 @@ namespace ShipIt.Repositories
         {
             string sql = string.Format("SELECT gcp_cd, gln_nm, gln_addr_02, gln_addr_03, gln_addr_04, gln_addr_postalcode, gln_addr_city, contact_tel, contact_mail " +
                 "FROM gcp " +
-                "WHERE gcp_cd = @gcp_cd IN ('{0}')",
+                "WHERE gcp_cd = gcp IN ('{0}')",
                 string.Join("','", gcp));
             return RunGetQuery(sql, reader => new CompanyDataModel(reader), "No company found with given gtin ids", null).ToList();
+
+            //string sql = string.Format("SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt
+            //FROM gtin WHERE p_id IN ('{0}')",
+            //    string.Join("','", ids));
+            //return RunGetQuery(sql, reader => new ProductDataModel(reader), "No products found with given ids", null).ToList();
         }
 
         public void AddCompanies(IEnumerable<Company> companies)
