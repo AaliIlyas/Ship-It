@@ -53,9 +53,13 @@ namespace ShipIt.Repositories
 
         public IEnumerable<ProductDataModel> GetProductsByIds(IEnumerable<int> ids)
         {
-            string sql = string.Format("SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE p_id IN ('{0}')",
-                string.Join("','", ids));
-            return RunGetQuery(sql, reader => new ProductDataModel(reader), "No products found with given ids", null).ToList();
+            if (ids.Count() != 0)
+            {
+                string sql = string.Format("SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE p_id IN ('{0}')",
+                    string.Join("','", ids));
+                return RunGetQuery(sql, reader => new ProductDataModel(reader), "No products found with given ids", null).ToList();
+            }
+            return new List<ProductDataModel>().AsEnumerable();
         }
 
         public void DiscontinueProductByGtin(string gtin)

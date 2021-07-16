@@ -33,13 +33,17 @@ namespace ShipIt.Repositories
             return base.RunSingleGetQuery(sql, reader => new CompanyDataModel(reader), noProductWithIdErrorMessage, parameter);
         }
 
-        public List<CompanyDataModel> GetCompaniesByGcps(IEnumerable<string> gcp)
+        public List<CompanyDataModel> GetCompaniesByGcps(IEnumerable<string> gcps)
         {
-            string sql = string.Format("SELECT gcp_cd, gln_nm, gln_addr_02, gln_addr_03, gln_addr_04, gln_addr_postalcode, gln_addr_city, contact_tel, contact_mail " +
-                "FROM gcp " +
-                "WHERE gcp_cd IN ('{0}')",
-                string.Join("','", gcp));
-            return RunGetQuery(sql, reader => new CompanyDataModel(reader), "No company found with given gtin ids", null).ToList();
+            if (gcps.Count() != 0)
+            {
+                string sql = string.Format("SELECT gcp_cd, gln_nm, gln_addr_02, gln_addr_03, gln_addr_04, gln_addr_postalcode, gln_addr_city, contact_tel, contact_mail " +
+                    "FROM gcp " +
+                    "WHERE gcp_cd IN ('{0}')",
+                    string.Join("','", gcps));
+                return RunGetQuery(sql, reader => new CompanyDataModel(reader), "No company found with given gtin ids", null).ToList();
+            }
+            return new List<CompanyDataModel>();
         }
 
         public void AddCompanies(IEnumerable<Company> companies)
