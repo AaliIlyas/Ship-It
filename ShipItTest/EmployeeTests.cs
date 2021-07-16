@@ -24,9 +24,9 @@ namespace ShipItTest
             onSetUp();
             Employee employee = new EmployeeBuilder().CreateEmployee();
             employeeRepository.AddEmployees(new List<Employee>() { employee });
-            Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).Name, employee.Name);
-            Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).Ext, employee.ext);
-            Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).WarehouseId, employee.WarehouseId);
+            Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).First().Name, employee.Name);
+            Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).First().Ext, employee.ext);
+            Assert.AreEqual(employeeRepository.GetEmployeeByName(employee.Name).First().WarehouseId, employee.WarehouseId);
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace ShipItTest
             AddEmployeesRequest addEmployeesRequest = employeeBuilder.CreateAddEmployeesRequest();
 
             Response response = employeeController.Post(addEmployeesRequest);
-            ShipIt.Models.DataModels.EmployeeDataModel databaseEmployee = employeeRepository.GetEmployeeByName(NAME);
+            ShipIt.Models.DataModels.EmployeeDataModel databaseEmployee = employeeRepository.GetEmployeeByName(NAME).First();
             Employee correctDatabaseEmploye = employeeBuilder.CreateEmployee();
 
             Assert.IsTrue(response.Success);
@@ -117,6 +117,7 @@ namespace ShipItTest
             try
             {
                 employeeController.Get(NAME);
+                var testEmployee = employeeController.Get(NAME);
                 Assert.Fail("Expected exception to be thrown.");
             }
             catch (NoSuchEntityException e)
