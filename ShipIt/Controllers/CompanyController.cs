@@ -28,7 +28,7 @@ namespace ShipIt.Controllers
 
             Log.Info($"Looking up company by name: {gcp}");
 
-            Models.DataModels.CompanyDataModel companyDataModel = _companyRepository.GetCompany(gcp);
+            Models.DataModels.CompanyDataModel companyDataModel = _companyRepository.GetCompanyByGcp(gcp);
             Company company = new Company(companyDataModel);
 
             Log.Info("Found company: " + company);

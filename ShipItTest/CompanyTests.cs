@@ -21,7 +21,7 @@ namespace ShipItTest
             onSetUp();
             Company company = new CompanyBuilder().CreateCompany();
             companyRepository.AddCompanies(new List<Company>() { company });
-            Assert.AreEqual(companyRepository.GetCompany(company.Gcp).Name, company.Name);
+            Assert.AreEqual(companyRepository.GetCompanyByGcp(company.Gcp).Name, company.Name);
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace ShipItTest
             AddCompaniesRequest addCompaniesRequest = companyBuilder.CreateAddCompaniesRequest();
 
             Response response = companyController.Post(addCompaniesRequest);
-            ShipIt.Models.DataModels.CompanyDataModel databaseCompany = companyRepository.GetCompany(GCP);
+            ShipIt.Models.DataModels.CompanyDataModel databaseCompany = companyRepository.GetCompanyByGcp(GCP);
             Company correctCompany = companyBuilder.CreateCompany();
 
             Assert.IsTrue(response.Success);
