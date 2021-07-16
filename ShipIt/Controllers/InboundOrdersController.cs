@@ -36,16 +36,8 @@ namespace ShipIt.Controllers
 
             Log.Debug(string.Format("Found operations manager: {0}", operationsManager));
 
-
             var allStock = _stockRepository.GetStockByWarehouseId(warehouseId);
-
-            var productIds = new List<int>().AsEnumerable();
-
-            if (allStock.Count()!=0)
-            {
-                productIds = allStock.Select(stock => stock.ProductId).Distinct();
-            }
-
+            var productIds = allStock.Select(stock => stock.ProductId).Distinct();
             var products = _productRepository.GetProductsByIds(productIds);   
             var companiesGcps = products.Select(product => product.Gcp).Distinct();
             var companies = _companyRepository.GetCompaniesByGcps(companiesGcps).ToList();
