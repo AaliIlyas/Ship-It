@@ -37,36 +37,11 @@ namespace ShipIt.Controllers
             Log.Debug(string.Format("Found operations manager: {0}", operationsManager));
 
 
-            var productIds = new List<int>();
-
-            var allStock = _stockRepository.GetStockByWarehouseId(warehouseId)
-                .Select(stock =>
-                {
-                    if (!productIds.Contains(stock.ProductId))
-                    {
-                        productIds.Add(stock.ProductId);
-                    }
-                    return stock;
-                }).ToList();
-
-            var companiesGcps = new List<string>();
-            var products = _productRepository.GetProductsByIds(productIds)
-                .Select(product =>
-                {
-                if (!companiesGcps.Contains(product.Gcp))
-                    {
-                    companiesGcps.Add(product.Gcp);
-                    }
-                    return product;
-                }).ToList();
-
+            var allStock = _stockRepository.GetStockByWarehouseId(warehouseId);
+            var productIds = allStock.Select(stock => stock.ProductId).Distinct();
+            var products = _productRepository.GetProductsByIds(productIds);   
+            var companiesGcps = products.Select(product => product.Gcp).Distinct();
             var companies = _companyRepository.GetCompaniesByGcps(companiesGcps).ToList();
-
-            //company, var companies has this list
-            //product, var products
-            //Stock held, Allstock, productId,
-
-            //iterate allstock
 
             var orderlinesByCompany = new Dictionary<CompanyDataModel, List<InboundOrderLine>>();
             foreach (StockDataModel stock in allStock)

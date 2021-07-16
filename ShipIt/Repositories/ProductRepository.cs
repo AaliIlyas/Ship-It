@@ -12,7 +12,7 @@ namespace ShipIt.Repositories
         int GetCount();
         ProductDataModel GetProductByGtin(string gtin);
         IEnumerable<ProductDataModel> GetProductsByGtin(List<string> gtins);
-        List<ProductDataModel> GetProductsByIds(List<int> ids);
+        IEnumerable<ProductDataModel> GetProductsByIds(IEnumerable<int> ids);
         ProductDataModel GetProductById(int id);
         void AddProducts(IEnumerable<ProductDataModel> products);
         void DiscontinueProductByGtin(string gtin);
@@ -51,7 +51,7 @@ namespace ShipIt.Repositories
             return RunSingleGetQuery(sql, reader => new ProductDataModel(reader), noProductWithIdErrorMessage, parameter);
         }
 
-        public List<ProductDataModel> GetProductsByIds(List<int> ids)
+        public IEnumerable<ProductDataModel> GetProductsByIds(IEnumerable<int> ids)
         {
             string sql = string.Format("SELECT p_id, gtin_cd, gcp_cd, gtin_nm, m_g, l_th, ds, min_qt FROM gtin WHERE p_id IN ('{0}')",
                 string.Join("','", ids));
