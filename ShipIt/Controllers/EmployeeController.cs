@@ -20,15 +20,19 @@ namespace ShipIt.Controllers
             _employeeRepository = employeeRepository;
         }
 
+
+        //Need to check
         [HttpGet("")]
         public EmployeeResponse Get([FromQuery] string name)
         {
             Log.Info($"Looking up employee by name: {name}");
 
-            Employee employee = new Employee(_employeeRepository.GetEmployeeByName(name));
+            Employee employees = new Employee(_employeeRepository.GetEmployeeByName(name).First());
 
-            Log.Info("Found employee: " + employee);
-            return new EmployeeResponse(employee);
+            //var employees = _employeeRepository.GetEmployeeByName(name).Select(person => new Employee(person));
+
+            Log.Info("Found employee: " + employees);
+            return new EmployeeResponse(employees);
         }
 
         [HttpGet("{warehouseId}")]
