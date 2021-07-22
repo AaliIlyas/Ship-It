@@ -2,6 +2,7 @@
 using ShipIt.Exceptions;
 using ShipIt.Models.ApiModels;
 using ShipIt.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,12 +28,27 @@ namespace ShipIt.Controllers
         {
             Log.Info($"Looking up employee by name: {name}");
 
-            Employee employees = new Employee(_employeeRepository.GetEmployeeByName(name).First());
+            try
+            {
+                var employees = _employeeRepository.GetEmployeeByName(name).Select(person => new Employee(person));
+                var amount = employees.Count();
+                //Employee employees = new Employee(_employeeRepository.GetEmployeeByName(name).First());
 
-            //var employees = _employeeRepository.GetEmployeeByName(name).Select(person => new Employee(person));
+                //if (amount < 2)
+                //{
+                //    var employee = employees.First();
+                //    return new EmployeeResponse(employee);
+                //}
+                
+                Log.Info("Found employee: " + employees);
+                return new EmployeeResponse(employees);
+            }
+            catch (NoSuchEntityException e)
+            {
+                throw e;
+            }
 
-            Log.Info("Found employee: " + employees);
-            return new EmployeeResponse(employees);
+
         }
 
         [HttpGet("{warehouseId}")]
